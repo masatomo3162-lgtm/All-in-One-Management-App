@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>理容室 統合管理</title>
+    <title>理容室 経営分析</title>
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </head>
 <body>
     <!-- PIN画面 -->
     <div id="pin-screen">
-        <h1 style="color:white; margin-bottom:20px;">✂ 理容室 統合管理</h1>
+        <h1 style="color:white; margin-bottom:20px;">✂ 理容室 経営分析</h1>
         <div class="pin-dots" id="pin-dots">
             <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
@@ -28,103 +27,110 @@
 
     <div id="main-app" style="display:none;">
         <header>
-            <h1 id="header-title">予約管理</h1>
+            <h1 id="header-title">売上入力</h1>
         </header>
 
         <main>
-            <!-- 予約セクション -->
-            <section id="sec-reservation" class="tab-content active">
-                <div id="calendar-view"></div>
-                <div id="day-view" style="display:none;">
-                    <div class="day-header">
-                        <button onclick="backToCalendar()">← 戻る</button>
-                        <h2 id="selected-date-display"></h2>
-                        <div></div>
-                    </div>
-                    <div class="controls">
-                        <button onclick="openReservationModal()" class="btn-primary">新規予約</button>
-                        <button onclick="openCustomerModal()" class="btn-secondary">新規顧客</button>
-                    </div>
-                    <div id="drag-time-indicator" style="display:none;"></div>
-                    <div id="reservation-timeline"></div>
-                </div>
-            </section>
-
-            <!-- 顧客セクション -->
-            <section id="sec-customer" class="tab-content">
-                <div class="search-bar">
-                    <input type="text" id="customer-search" placeholder="名前・電話番号で検索...">
-                    <button onclick="openCustomerModal()" class="btn-primary">＋追加</button>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr><th>名前</th><th>電話番号</th><th>最終来店</th><th>操作</th></tr>
-                        </thead>
-                        <tbody id="customer-list"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- 売上セクション -->
-            <section id="sec-sales" class="tab-content">
-                <div class="sales-tabs">
-                    <button class="sub-tab active" onclick="showSubSales('sales-analysis')">分析</button>
-                    <button class="sub-tab" onclick="showSubSales('multi-store')">2店舗管理</button>
-                    <button class="sub-tab" onclick="showSubSales('sales-input')">売上入力</button>
-                </div>
-
-                <div id="sales-analysis" class="sub-sales-content active">
-                    <div class="month-selector">
-                        <select id="analysis-month" onchange="renderSalesAnalysis()"></select>
-                    </div>
-                    <div class="metrics-grid" id="sales-metrics"></div>
-                    <div class="card">
-                        <h3>売上推移</h3>
-                        <div class="chart-container"><canvas id="sales-chart"></canvas></div>
-                    </div>
-                    <div class="card">
-                        <h3>客層・メニュー分析</h3>
-                        <div class="chart-container"><canvas id="analysis-pie-chart"></canvas></div>
-                    </div>
-                </div>
-
-                <div id="multi-store" class="sub-sales-content">
-                    <div class="store-names">
-                        <div class="store-box store-a">
-                            <input id="name-a" onchange="saveStoreNames()" placeholder="店舗A">
+            <!-- 入力セクション -->
+            <section id="sec-input" class="tab-content active">
+                <div class="card">
+                    <h3>日次売上入力</h3>
+                    <form id="daily-sales-form">
+                        <div class="form-group">
+                            <label>日付</label>
+                            <input type="date" id="sale-date" required>
                         </div>
-                        <div class="store-box store-b">
-                            <input id="name-b" onchange="saveStoreNames()" placeholder="店舗B">
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3>月別売上比較</h3>
-                        <div id="multi-store-table-container"></div>
-                    </div>
-                </div>
-
-                <div id="sales-input" class="sub-sales-content">
-                    <div class="card">
-                        <h3>日次売上直接入力</h3>
-                        <form id="daily-sales-form">
+                        <div class="form-row">
                             <div class="form-group">
-                                <label>日付</label>
-                                <input type="date" id="sale-date" required>
+                                <label>現金 (¥)</label>
+                                <input type="number" id="sale-cash" placeholder="0">
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>現金</label>
-                                    <input type="number" id="sale-cash" placeholder="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>キャッシュレス</label>
-                                    <input type="number" id="sale-credit" placeholder="0">
-                                </div>
+                            <div class="form-group">
+                                <label>キャッシュレス (¥)</label>
+                                <input type="number" id="sale-credit" placeholder="0">
                             </div>
-                            <button type="submit" class="btn-primary">保存</button>
-                        </form>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>客数 (名)</label>
+                                <input type="number" id="sale-guests" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label>客層メモ</label>
+                                <input type="text" id="sale-memo" placeholder="例: 男性3/女性1">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width:100%">保存</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>最近の記帳</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>日付</th><th>売上</th><th>客数</th><th>操作</th></tr></thead>
+                            <tbody id="recent-sales-list"></tbody>
+                        </table>
                     </div>
+                </div>
+            </section>
+
+            <!-- 分析セクション -->
+            <section id="sec-analysis" class="tab-content">
+                <div class="month-selector">
+                    <select id="analysis-month" onchange="renderAnalysis()"></select>
+                </div>
+                <div class="metrics-grid" id="sales-metrics"></div>
+                <div class="card">
+                    <h3>売上推移</h3>
+                    <div class="chart-container"><canvas id="sales-chart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3>曜日別分析</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>曜日</th><th>平均売上</th><th>平均客数</th></tr></thead>
+                            <tbody id="weekday-analysis-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2店舗比較セクション -->
+            <section id="sec-multi" class="tab-content">
+                <div class="store-names">
+                    <div class="store-box store-a">
+                        <input id="name-a" onchange="saveStoreNames()" placeholder="店舗A">
+                    </div>
+                    <div class="store-box store-b">
+                        <input id="name-b" onchange="saveStoreNames()" placeholder="店舗B">
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>月次売上入力 (他店舗・ログ用)</h3>
+                    <form id="monthly-sales-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>年月</label>
+                                <input type="month" id="monthly-ym" required>
+                            </div>
+                            <div class="form-group">
+                                <label>店舗名</label>
+                                <select id="monthly-store-id">
+                                    <option value="a">店舗A</option>
+                                    <option value="b">店舗B</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>月間売上 (¥)</label>
+                            <input type="number" id="monthly-amount" required>
+                        </div>
+                        <button type="submit" class="btn-secondary" style="width:100%">ログ保存</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>店舗別実績比較</h3>
+                    <div class="table-container" id="multi-store-table-container"></div>
                 </div>
             </section>
 
@@ -154,103 +160,19 @@
         </main>
 
         <nav class="bottom-nav">
-            <button onclick="switchTab('reservation')" id="nav-reservation" class="active">
-                <i>📅</i><span>予約</span>
+            <button onclick="switchTab('input')" id="nav-input" class="active">
+                <i>📝</i><span>入力</span>
             </button>
-            <button onclick="switchTab('customer')" id="nav-customer">
-                <i>👥</i><span>顧客</span>
+            <button onclick="switchTab('analysis')" id="nav-analysis">
+                <i>📊</i><span>分析</span>
             </button>
-            <button onclick="switchTab('sales')" id="nav-sales">
-                <i>💰</i><span>売上</span>
+            <button onclick="switchTab('multi')" id="nav-multi">
+                <i>⚖️</i><span>2店舗</span>
             </button>
             <button onclick="switchTab('settings')" id="nav-settings">
                 <i>⚙️</i><span>設定</span>
             </button>
         </nav>
-    </div>
-
-    <!-- モーダル類 (予約・顧客・詳細) -->
-    <div id="reservation-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('reservation-modal')">&times;</span>
-            <h3 id="res-modal-title">予約登録</h3>
-            <form id="reservation-form">
-                <input type="hidden" id="res-id">
-                <div class="form-group">
-                    <label>顧客</label>
-                    <select id="res-customer-id" required></select>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>開始時間</label>
-                        <input type="time" id="res-start-time" required>
-                    </div>
-                    <div class="form-group">
-                        <label>料金 (円)</label>
-                        <input type="number" id="res-price" placeholder="0">
-                    </div>
-                </div>
-                <div class="menu-selection">
-                    <label>メニュー</label>
-                    <div class="menu-grid">
-                        <label><input type="checkbox" name="menu" data-time="25"> カット</label>
-                        <label><input type="checkbox" name="menu" data-time="15"> シェービング</label>
-                        <label><input type="checkbox" name="menu" data-time="15"> シャンプー</label>
-                        <label><input type="checkbox" name="menu" data-time="60"> カラー</label>
-                        <label><input type="checkbox" name="menu" data-time="90"> パーマ</label>
-                        <label><input type="checkbox" name="menu" data-time="10"> 耳掃除</label>
-                        <label><input type="checkbox" name="menu" data-time="20"> 白髪ぼかし</label>
-                        <label><input type="checkbox" name="menu" data-time="25"> 女カット</label>
-                        <label><input type="checkbox" name="menu" data-time="30"> 女顔そり</label>
-                        <label><input type="checkbox" name="menu" data-time="180"> 縮毛矯正</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>合計時間: <span id="res-total-time">0</span> 分 (+5分休憩)</label>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn-primary">保存</button>
-                    <button type="button" id="res-delete-btn" class="btn-danger" style="display:none;" onclick="handleResDelete()">削除</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="customer-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('customer-modal')">&times;</span>
-            <h3 id="cust-modal-title">顧客登録</h3>
-            <form id="customer-form">
-                <input type="hidden" id="cust-id">
-                <div class="form-group">
-                    <label>名前</label>
-                    <input type="text" id="cust-name" required>
-                </div>
-                <div class="form-group">
-                    <label>電話番号</label>
-                    <input type="tel" id="cust-phone">
-                </div>
-                <div class="form-group">
-                    <label>メモ (改行で箇条書き)</label>
-                    <textarea id="cust-note" rows="5"></textarea>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn-primary">保存</button>
-                    <button type="button" id="cust-delete-btn" class="btn-danger" style="display:none;" onclick="handleCustDelete()">削除</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="customer-detail-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('customer-detail-modal')">&times;</span>
-            <h3 id="detail-name">顧客詳細</h3>
-            <div id="detail-info"></div>
-            <h4>施術履歴</h4>
-            <div id="detail-history"></div>
-            <button onclick="editCustomerFromDetail()" class="btn-secondary" style="margin-top:10px;">情報を編集</button>
-        </div>
     </div>
 
     <script src="js/db.js"></script>

@@ -2,20 +2,10 @@ let db;
 
 async function initDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('BarberManagerDB', 3);
+        const request = indexedDB.open('BarberSalesManagerDB', 1);
 
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
-            
-            // 顧客ストア
-            if (!db.objectStoreNames.contains('customers')) {
-                db.createObjectStore('customers', { keyPath: 'id', autoIncrement: true });
-            }
-            
-            // 予約ストア
-            if (!db.objectStoreNames.contains('reservations')) {
-                db.createObjectStore('reservations', { keyPath: 'id', autoIncrement: true });
-            }
             
             // 日次売上ストア (詳細分析用)
             if (!db.objectStoreNames.contains('dailySales')) {
@@ -42,7 +32,6 @@ async function initDB() {
     });
 }
 
-// 共通CRUD操作
 async function getData(storeName, key) {
     return new Promise((resolve) => {
         const transaction = db.transaction([storeName], 'readonly');
@@ -79,7 +68,6 @@ async function deleteData(storeName, key) {
     });
 }
 
-// 特定のヘルパー関数
 async function getSettings(key, defaultValue) {
     const res = await getData('settings', key);
     return res ? res.value : defaultValue;
